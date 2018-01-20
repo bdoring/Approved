@@ -11,6 +11,10 @@ app.set('view engine', 'ejs');
 var routes_setter = require('./config/routes.js');
 routes_setter(app);
 
+app.use(function(req,res) {
+  res.send('404')
+})
+
 app.listen(port, function() {
   console.log('Listening on', port);
 });
