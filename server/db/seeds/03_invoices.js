@@ -6,7 +6,6 @@ exports.seed = function(knex, Promise) {
       // Inserts seed entries
       return knex('invoices').insert([
         {
-          id: 1,
           vendor_id: 1,
           invoice_number: '001',
           amount: '500.00',
@@ -17,7 +16,6 @@ exports.seed = function(knex, Promise) {
           action_user: 2
         },
         {
-          id: 2,
           vendor_id: 2,
           invoice_number: '001',
           amount: '500.00',

@@ -12,7 +12,8 @@ exports.up = function(knex, Promise) {
     table.date('invoice_date');
     table.date('invoice_due_date');
     table.string('url');
-    table.string('status');
+    table.string('status')
+      .defaultTo('pending');
     table.integer('action_user')
       .references('id')
       .inTable('users')
