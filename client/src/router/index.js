@@ -5,6 +5,7 @@ import UploadNewInvoice from '@/components/UploadNewInvoice'
 import CreateVendor from '@/components/CreateVendor'
 import EditVendor from '@/components/EditVendor'
 import CreateUser from '@/components/CreateUser'
+import EditUser from '@/components/EditUser'
 
 Vue.use(Router)
 
@@ -35,6 +36,11 @@ export default new Router({
       path: '/create-user',
       name: 'CreateUser',
       component: CreateUser
+    },
+    {
+      path: '/edit-user',
+      name: 'EditUser',
+      component: EditUser
     }
   ]
 })

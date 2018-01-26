@@ -120,7 +120,8 @@ export default {
         makeRequest: true,
         data: {},
         success(response) {
-          console.log('Logout response:', response)
+          console.log('Logout response:', response);
+          localStorage.clear();
         },
         error(err) {
           this.errMsg = true

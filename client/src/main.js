@@ -73,6 +73,11 @@ Vue.filter('proper', value => {
   return value[0] + value.slice(1).toLowerCase();
 })
 
+Vue.filter('formatDate', value => {
+  const [year, month, day] = value.split('-')
+  return `${month.padStart(2, '0')}-${day.padStart(2, '0')}-${year}`
+})
+
 new Vue({
   el: '#app',
   router,

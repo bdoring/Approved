@@ -224,7 +224,7 @@
         .then(response => {
           console.log('users retrieved:', response.data);
           this.approvers = response.data.filter(user => {
-            if (user.type.toLowerCase() === "approver") {
+            if (user.role.toLowerCase() === "approver") {
               user.fullName = `${user.first_name[0] + user.first_name.slice(1).toLowerCase()} ${user.last_name[0] + user.last_name.slice(1).toLowerCase()}`;
               return user;
             }

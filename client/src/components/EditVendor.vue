@@ -116,9 +116,6 @@
     </div>
    <div v-if="vendorUpdated">
      <h3>Vendor was updated successfully!</h3>
-     <v-btn
-     color="primary"
-     @click="vendorUpdated=false">Go Back</v-btn>
    </div>
  </div>
 </template>

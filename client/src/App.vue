@@ -1,7 +1,7 @@
 <template>
   <div>
     <login v-if="!this.$auth.token()"></login>
-    <dashboard v-else></dashboard>
+    <dashboard v-if="this.$auth.token()"></dashboard>
 
   </div>
 </template>
