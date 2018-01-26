@@ -1,6 +1,9 @@
 <template>
-  <dashboard v-if="loggedIn"></dashboard>
-  <login v-else="loggedIn"></login>
+  <div>
+    <login v-if="!this.$auth.token()"></login>
+    <dashboard v-else></dashboard>
+
+  </div>
 </template>
 
 <script>
@@ -14,7 +17,13 @@ export default {
   },
   data () {
     return {
-      loggedIn: false
+
+    }
+  },
+  mounted(){
+    if (!this.$auth.token()) {
+      console.log('rerouting...')
+      this.$router.push('/')
     }
   }
 }
@@ -22,11 +31,12 @@ export default {
 
 <style>
 body{
-    margin: 0;
-    box-sizing: border-box;
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #2c3e50;
+  margin: 0;
+  box-sizing: border-box;
+}
+#app{
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
   }
 </style>

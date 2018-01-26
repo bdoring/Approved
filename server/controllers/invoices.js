@@ -1,13 +1,18 @@
 const knex = require("../db/knex.js");
+const AWS = require('aws-sdk');
+
+AWS.config.loadFromPath('./config.json');
+let s3Bucket = new AWS.S3({params: {Bucket: 'approved-capstone'}});
+const baseAWS_URL = "https://s3-us-west-2.amazonaws.com/approved-capstone/"
 
 function getInvoiceFromRequest(request) {
   return {
     vendor_id: request.vendor_id,
-    invoice_number: request.invoice_number,
+    invoice_number: request.invoice_number.toUpperCase(),
     amount: request.amount,
     invoice_date: request.invoice_date,
     invoice_due_date: request.invoice_due_date,
-    url: request.url
+    action_user: request.action_user
   }
 }
 
@@ -29,6 +34,9 @@ module.exports = {
   },
 
   createOne: function(req, res) {
+    console.log('SERVER - file upload req.body:', req.body);
+    console.log('SERVER - file upload req.files:', req.files);
+    console.log('UPLOADING...');
     let newInvoice = getInvoiceFromRequest(req.body);
     //look for duplicated invoices from same vendor
     knex('invoices')
@@ -36,18 +44,25 @@ module.exports = {
       .where('vendor_id', newInvoice.vendor_id)
       .then((duplicateInvoice) => {
         if (duplicateInvoice[0]) {
-          res.send({error: 'Duplicate invoice number. Please provide unique invoice number.'});
+          res.status(400).send({error: 'Duplicate invoice number. Please provide unique invoice number.'});
         } else {
-          knex('vendors')
-            .where('id', newInvoice.vendor_id)
-            .then((vendor) => {
-              //get approver of invoice
-              newInvoice.action_user = vendor[0].user_id;
-              knex('invoices')
-                .insert(newInvoice, '*')
-                .then((invoice) => {
-                  res.send(invoice);
-                })
+          let uploadInvoice = {
+            Key: `${newInvoice.vendor_id}-${newInvoice.invoice_number}`,
+            Body: req.files.invoicePDF.data,
+            ContentType: req.files.invoicePDF.mimetype,
+            ACL: 'public-read'
+          };
+          s3Bucket.putObject(uploadInvoice, function(err, data) {
+            if (err) {
+              console.log(err);
+              return;
+            }
+          });
+          newInvoice.url = baseAWS_URL + uploadInvoice.Key;
+          knex('invoices')
+            .insert(newInvoice, '*')
+            .then((invoice) => {
+              res.send(invoice);
             })
         }
       })

@@ -10,9 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.186.0",
     "bcrypt": "^1.0.3",
+    "cors": "^2.8.4",
     "ejs": "^2.5.7",
     "express": "^4.16.2",
+    "express-fileupload": "^0.4.0",
+    "jsonwebtoken": "^8.1.1",
     "knex": "^0.13.0",
     "pg": "^7.3.0"
   }

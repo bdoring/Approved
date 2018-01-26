@@ -11,12 +11,12 @@ exports.up = function(knex, Promise) {
     table.string('street_address');
     table.string('city');
     table.string('state');
-    table.string('zip');
+    table.string('zipcode');
     table.string('phone_number');
     table.string('email');
     table.string('tin');
     table.string('tin_type');
-    table.string('payment_terms');
+    table.string('net_terms');
     table.string('payment_method');
     table.string('gl_code');
   })

@@ -23,4 +23,15 @@ module.exports = function(app){
   app.post('/invoices', invoices.createOne);
   app.patch('/invoices/:id', invoices.updateOne);
 
+  //Auth Routes
+  app.post('/auth/login', users.login);
+  app.post('/auth/logout', function(req, res) {
+    res.send({ route: 'logout'})
+  });
+  app.get('/auth/user', function(req, res) {
+    res.send({ route: 'user' })
+  });
+  app.get('/auth/refresh', function(req, res) {
+    res.send({ route: 'refresh' })
+  });
 }

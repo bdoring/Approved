@@ -1,7 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
-import About from '@/components/About'
+import Home from '@/components/Home'
+import UploadNewInvoice from '@/components/UploadNewInvoice'
+import CreateVendor from '@/components/CreateVendor'
+import EditVendor from '@/components/EditVendor'
+import CreateUser from '@/components/CreateUser'
 
 Vue.use(Router)
 
@@ -10,13 +13,28 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
+      name: 'Home',
+      component: Home
     },
     {
-      path: '/about',
-      name: 'About',
-      component: About
+      path: '/new-invoice',
+      name: 'UploadNewInvoice',
+      component: UploadNewInvoice
+    },
+    {
+      path: '/create-vendor',
+      name: 'CreateVendor',
+      component: CreateVendor
+    },
+    {
+      path: '/edit-vendor',
+      name: 'EditVendor',
+      component: EditVendor
+    },
+    {
+      path: '/create-user',
+      name: 'CreateUser',
+      component: CreateUser
     }
   ]
 })

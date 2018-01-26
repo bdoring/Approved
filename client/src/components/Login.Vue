@@ -3,23 +3,23 @@
     <div class="login">
       <h1 id="logo">Approved</h1>
       <div class="login-form elevation-24">
-        <v-form v-model="valid" ref="form" lazy-validation>
+        <v-form v-model="valid" ref="form">
           <v-text-field
             label="Email"
-            v-model="name"
-            :rules="nameRules"
+            v-model="email"
+            :rules="emailRules"
             required
           ></v-text-field>
           <v-text-field
             label="Password"
-            v-model="email"
-            :rules="emailRules"
+            v-model="password"
+            :rules="passwordRules"
             type="password"
             required
           ></v-text-field>
 
           <v-btn
-            @click="submit"
+            @click="userLogin"
             :disabled="!valid"
           >
             login
@@ -27,45 +27,62 @@
         </v-form>
       </div>
     </div>
+    <div class="error-box">
+      <v-alert
+        color="error"
+        icon="warning"
+        transition="scale-transition"
+        v-model="alert"
+        outline
+        type="warning"
+      >
+        Invalid credentials. Please try again.
+      </v-alert>
+    </div>
+    <app-footer></app-footer>
   </v-app>
 </template>
 
 <script>
+import Footer from './Footer.vue'
+
 export default {
+    components: {
+      'app-footer': Footer
+    },
     data:() => ({
-      valid: true,
-      name: '',
-      nameRules: [
+      alert: false,
+      valid: false,
+      email: null,
+      emailRules: [
         (v) => !!v || 'Email is required',
         (v) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'Email must be valid'
       ],
-      email: '',
-      emailRules: [
+      password: null,
+      passwordRules: [
         (v) => !!v || 'Password is required'
-      ],
-      select: null,
-      items: [
-        'Item 1',
-        'Item 2',
-        'Item 3',
-        'Item 4'
-      ],
-      checkbox: false
+      ]
     }),
     methods: {
-      submit () {
-        if (this.$refs.form.validate()) {
-          // Native form submission is not yet supported
-          axios.post('/api/submit', {
-            name: this.name,
-            email: this.email,
-            select: this.select,
-            checkbox: this.checkbox
-          })
-        }
-      },
       clear () {
         this.$refs.form.reset()
+      },
+      userLogin () {
+        this.$auth.login({
+          data: {
+            email: this.email,
+            password: this.password
+          },
+          success(response) {
+            console.log('response', response);
+            this.$auth.token(null, response.data.token)
+            this.$auth.user(response.data.user[0])
+          },
+          error(err) {
+            this.errMsg = true
+            this.alert = true
+          }
+        })
       }
     }
   }
@@ -89,4 +106,9 @@ export default {
     color: #2c3e50;
     margin: 30px;
   }
+  .error-box{
+    margin: 20px auto;
+    width: 300px;
+  }
+
 </style>
