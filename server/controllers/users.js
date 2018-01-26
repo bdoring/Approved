@@ -7,7 +7,7 @@ function getUserFromRequest(request) {
     first_name: request.first_name.toUpperCase(),
     last_name: request.last_name.toUpperCase(),
     email: request.email.toUpperCase(),
-    password: request.password.toUpperCase(),
+    password: request.password || null,
     role: request.role.toUpperCase()
   }
 }
@@ -22,7 +22,7 @@ module.exports = {
   login: function(req, res) {
     let loginUser = {
       email: req.body.email.toUpperCase(),
-      password: req.body.password.toUpperCase()
+      password: req.body.password
     }
     knex('users')
       .where('email', loginUser.email)
@@ -34,6 +34,7 @@ module.exports = {
                 let token = jwt.sign({ user }, 'secret-string');
                 res.send({ user, token});
               } else {
+                console.log('password mismatch')
                 res.status(401).send({error: 'Invalid Login'})
               }
           })
@@ -79,11 +80,27 @@ module.exports = {
 
   updateOne: function(req, res) {
     let updatedUser = getUserFromRequest(req.body);
-    knex('users')
-      .update(updatedUser, '*')
-      .where('id', req.params.id)
-      .then((user) => {
-        user[0] ? res.send(user) : res.send({error: "User Not Found."});
+
+    //if the user updated their password, the password will need to be re-hashed
+    if (updatedUser.password) {
+      console.log('User Updated Password.')
+      passwordEncryption.hash(updatedUser).then((encryptedUser) => {
+        knex('users')
+          .update(encryptedUser, '*')
+          .where('id', req.params.id)
+          .then((user) => {
+            res.status(200).send(user);
+          })
       })
+    } else {
+      delete(updatedUser.password); //this value is null
+      console.log('User did NOT update password', updatedUser)
+      knex('users')
+        .update(updatedUser, '*')
+        .where('id', req.params.id)
+        .then((user) => {
+          user[0] ? res.send(user) : res.send({error: "User Not Found."});
+        })
+    }
   }
 }

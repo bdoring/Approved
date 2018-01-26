@@ -20,6 +20,10 @@ module.exports = {
 
   getAll: function(req, res) {
     knex('invoices')
+      .join('vendors', 'vendors.id', 'invoices.vendor_id')
+      .join('users', 'users.id', 'invoices.action_user')
+      .select('invoices.*', 'vendors.name', 'vendors.net_terms', 'vendors.payment_method', 'users.first_name', 'users.last_name')
+      .orderBy('invoices.invoice_due_date', 'asc')
       .then((invoices) => {
         res.send(invoices);
       })
