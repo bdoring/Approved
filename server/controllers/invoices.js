@@ -91,5 +91,21 @@ module.exports = {
             })
         }
       })
+  },
+
+  approveOrReject: function(req, res){
+    let newStatus = {
+      status: req.body.status
+    };
+    console.log('new invoice status:', newStatus)
+    knex('invoices')
+      .update(newStatus, '*')
+      .where('id', req.params.id)
+      .then(update => {
+        res.status(200).send(update);
+      })
+      .catch(err => {
+        res.status(500).send({error: "Invoice Not Found."});
+      })
   }
 }

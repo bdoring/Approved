@@ -26,8 +26,21 @@
      <v-form v-model="valid" ref="form" v-if="vendorSelected">
        <div class="approver" >
          <v-flex>
-           <p>Approver: {{ vendorSelected.first_name | proper }} {{ vendorSelected.last_name | proper }}
-           </p>
+           <h2>Current Approver: {{ vendorSelected.first_name | proper }} {{ vendorSelected.last_name | proper }}
+             <v-btn color="primary" @click="changeApprover = true" ><v-icon left>person</v-icon>Change Approver</v-btn>
+           </h2>
+           <div class="changeApprover" v-if="changeApprover">
+             <v-select
+               label="New Approver"
+               v-model="newApprover"
+               :items="approvers"
+               item-text="fullName"
+               :rules="[v => !!v || 'Approver is required']"
+               autocomplete
+               required
+             ></v-select>
+             <v-btn @click="cancel">Cancel</v-btn>
+           </div>
          </v-flex>
        </div>
        <v-text-field
@@ -125,6 +138,9 @@
 		data() {
 			return {
         vendorUpdated: false,
+        changeApprover: false,
+        listOfApprovers: [],
+        newApprover: {},
         valid: false,
         vendorSelected: null,
         vendors: [],
@@ -202,12 +218,24 @@
     methods: {
       submit() {
         console.log('this.vendorSelected:', this.vendorSelected.id);
+        if (this.changeApprover) {
+          this.vendorSelected.user_id = this.newApprover.id;
+        }
         this.axios.patch(`/vendors/${this.vendorSelected.id}`, this.vendorSelected)
           .then(response => {
             console.log('response from edit vendor:', response.data);
             this.$refs.form.reset();
             this.vendorUpdated = true;
           })
+      },
+      cancel(){
+        this.changeApprover = false;
+        this.newApprover = null;
+      }
+    },
+    computed:{
+      approvers() {
+        return this.listOfApprovers.filter(approver => approver.id != this.vendorSelected.user_id)
       }
     },
     created() {
@@ -215,11 +243,30 @@
         .then(response => {
           console.log('Your vendors are:', response.data);
           this.vendors = response.data;
+        });
+      this.axios.get('/users')
+        .then(response => {
+          this.listOfApprovers = response.data.filter(user => {
+            if (user.role.toLowerCase() === 'approver') {
+              user.fullName = `${user.first_name[0] + user.first_name.slice(1).toLowerCase()} ${user.last_name[0] + user.last_name.slice(1).toLowerCase()}`;
+              return user;
+            }
+          })
         })
     }
 	}
 </script>
 
 <style scoped>
+.approver{
+  margin: 10px 0;
+}
 
+.changeApprover{
+  width: 350px;
+  margin: 5px 0 30px 10px;
+  padding: 10px;
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+}
 </style>

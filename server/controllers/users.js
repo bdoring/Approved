@@ -80,8 +80,7 @@ module.exports = {
 
   updateOne: function(req, res) {
     let updatedUser = getUserFromRequest(req.body);
-
-    //if the user updated their password, the password will need to be re-hashed
+    // if the user updated their password, the password will need to be re-hashed
     if (updatedUser.password) {
       console.log('User Updated Password.')
       passwordEncryption.hash(updatedUser).then((encryptedUser) => {

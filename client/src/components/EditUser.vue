@@ -46,7 +46,7 @@
            label="User Role"
            v-model="userSelected.role"
            :items="userRoles"
-           :rules="[v => !!v || 'Item is required']"
+           :rules="[v => !!v || 'Role is required']"
            required
          ></v-select>
          <div class="update-password">

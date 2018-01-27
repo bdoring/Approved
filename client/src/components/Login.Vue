@@ -78,9 +78,9 @@ export default {
             this.$auth.token(null, response.data.token)
             this.$auth.user(response.data.user[0])
             let user = {
+              id: response.data.user[0].id,
               first_name: response.data.user[0].first_name,
-              role: response.data.user[0].role,
-
+              role: response.data.user[0].role
             }
             localStorage.setItem('user', JSON.stringify(user));
           },

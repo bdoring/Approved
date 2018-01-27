@@ -6,6 +6,9 @@ import CreateVendor from '@/components/CreateVendor'
 import EditVendor from '@/components/EditVendor'
 import CreateUser from '@/components/CreateUser'
 import EditUser from '@/components/EditUser'
+import HomeApprover from '@/components/HomeApprover'
+import PastInvoices from '@/components/PastInvoices'
+import EditYourAccount from '@/components/EditYourAccount'
 
 Vue.use(Router)
 
@@ -13,7 +16,7 @@ export default new Router({
   mode: 'history',
   routes: [
     {
-      path: '/',
+      path: '/home-admin',
       name: 'Home',
       component: Home
     },
@@ -41,6 +44,21 @@ export default new Router({
       path: '/edit-user',
       name: 'EditUser',
       component: EditUser
+    },
+    {
+      path: '/home-approver',
+      name: 'HomeApprover',
+      component: HomeApprover
+    },
+    {
+      path: '/invoices',
+      name: 'PastInvoices',
+      component: PastInvoices
+    },
+    {
+      path: '/edit-account',
+      name: 'EditYourAccount',
+      component: EditYourAccount
     }
   ]
 })

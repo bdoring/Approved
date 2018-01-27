@@ -25,6 +25,7 @@ import {
   VCard,
   VDivider,
   VSubheader,
+  VDialog,
   transitions
 } from 'vuetify'
 import '../node_modules/vuetify/src/stylus/app.styl'
@@ -49,6 +50,7 @@ Vue.use(Vuetify, {
     VCard,
     VDivider,
     VSubheader,
+    VDialog,
     transitions
   }
 })
@@ -70,12 +72,16 @@ Vue.use(require('@websanova/vue-auth'), {
 })
 
 Vue.filter('proper', value => {
-  return value[0] + value.slice(1).toLowerCase();
+  return value[0].toUpperCase() + value.slice(1).toLowerCase();
 })
 
 Vue.filter('formatDate', value => {
   const [year, month, day] = value.split('-')
   return `${month.padStart(2, '0')}-${day.padStart(2, '0')}-${year}`
+})
+
+Vue.filter('currencyFormat', value => {
+  return Number(value).toFixed(2);
 })
 
 new Vue({

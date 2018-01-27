@@ -11,7 +11,29 @@
       style="margin-top: 65px;"
     >
       <v-list style="padding: 0;">
-        <template v-for="(item, i) in items"
+        <!-- ADMIN SIDEBAR -->
+        <template v-for="(item, i) in items.admin" v-if="user.role.toLowerCase()==='admin'"
+          >
+          <v-list-tile
+            v-if="item.action"
+            value="true"
+            @click=""
+            v-bind:to="item.action"
+            exact
+          >
+            <v-list-tile-action>
+              <v-icon v-html="item.icon"></v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title v-text="item.title"></v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-divider v-else-if="item.divider"></v-divider>
+          <v-subheader v-else-if="item.header" v-text="item.header" ></v-subheader>
+        </template>
+
+        <!-- APPROVER SIDEBAR -->
+        <template v-for="(item, i) in items.approver" v-if="user.role.toLowerCase()==='approver'"
           >
           <v-list-tile
             v-if="item.action"
@@ -62,52 +84,78 @@ export default {
   },
   data () {
     return {
+      user: JSON.parse(localStorage.getItem('user')),
       clipped: true,
       drawer: true,
-      items: [
-        {
-          icon: 'home',
-          title: 'Home',
-          action: '/'
-        },
-        {
-          icon: 'attach_file',
-          title: 'Upload New Invoice',
-          action: '/new-invoice'
-        },
-        {
-          divider: true
-        },
-        {
-          header: 'Maintain Vendors'
-        },
-        {
-          icon: 'group_add',
-          title: 'Create Vendor',
-          action: '/create-vendor'
-        },
-        {
-          icon: 'group',
-          title: 'Edit Vendor',
-          action: '/edit-vendor'
-        },
-        {
-          divider: true
-        },
-        {
-          header: 'Maintain Users'
-        },
-        {
-          icon: 'person_add',
-          title: 'Create User',
-          action: '/create-user'
-        },
-        {
-          icon: 'person',
-          title: 'Edit User',
-          action: '/edit-user'
-        },
-      ],
+      items: {
+        admin: [
+          {
+            icon: 'home',
+            title: 'Home',
+            action: '/home-admin'
+          },
+          {
+            icon: 'attach_file',
+            title: 'Upload New Invoice',
+            action: '/new-invoice'
+          },
+          {
+            divider: true
+          },
+          {
+            header: 'Maintain Vendors'
+          },
+          {
+            icon: 'group_add',
+            title: 'Create Vendor',
+            action: '/create-vendor'
+          },
+          {
+            icon: 'group',
+            title: 'Edit Vendor',
+            action: '/edit-vendor'
+          },
+          {
+            divider: true
+          },
+          {
+            header: 'Maintain Users'
+          },
+          {
+            icon: 'person_add',
+            title: 'Create User',
+            action: '/create-user'
+          },
+          {
+            icon: 'person',
+            title: 'Edit User',
+            action: '/edit-user'
+          },
+        ],
+        approver:[
+          {
+            icon: 'home',
+            title: 'Home',
+            action: '/home-approver'
+          },
+          {
+            icon: 'insert_drive_file',
+            title: 'Past Invoices',
+            action: '/invoices'
+          },
+          {
+            divider: true
+          },
+          {
+            header: 'Settings'
+          },
+          {
+            icon: 'edit',
+            title: 'Edit Your Account',
+            action: '/edit-account'
+          },
+        ]
+      },
       miniVariant: false,
       right: true,
       rightDrawer: false,
@@ -129,6 +177,10 @@ export default {
         }
       })
     }
+  },
+  created(){
+    let userRole = JSON.parse(localStorage.getItem('user')).role.toLowerCase();
+    userRole === "admin" ? this.$router.push('/home-admin') : this.$router.push('/home-approver')
   }
 }
 </script>
