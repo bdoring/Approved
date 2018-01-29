@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import { store } from './store/store'
 import VueAxios from 'vue-axios'
 import axios from 'axios'
 import {
@@ -26,6 +27,7 @@ import {
   VDivider,
   VSubheader,
   VDialog,
+  VBadge,
   transitions
 } from 'vuetify'
 import '../node_modules/vuetify/src/stylus/app.styl'
@@ -51,6 +53,7 @@ Vue.use(Vuetify, {
     VDivider,
     VSubheader,
     VDialog,
+    VBadge,
     transitions
   }
 })
@@ -85,6 +88,7 @@ Vue.filter('currencyFormat', value => {
 })
 
 new Vue({
+  store: store,
   el: '#app',
   router,
   components: { App },

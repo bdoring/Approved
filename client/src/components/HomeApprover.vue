@@ -66,6 +66,8 @@
 </template>
 
 <script>
+  import { mapActions } from 'vuex';
+
 	export default {
 		data() {
 			return {
@@ -76,6 +78,9 @@
           searchbar: ""
 			}
 		},
+    computed: {
+      ...mapActions(['updateInvoicesPending'])
+    },
     methods: {
       dueDate(invoiceDueDate) {
         let milisecondsInADay = 1000 * 60 * 60 * 24;
@@ -91,6 +96,7 @@
             console.log('response from approved invoice:', response.data);
             this.pendingInvoices = this.pendingInvoices.filter(invoice => invoice.id !== invoiceID);
             this.invoiceList = this.pendingInvoices;
+            this.$store.dispatch("updateInvoicesPending", this.pendingInvoices);
           })
           .catch(err => {
             console.log('error from approved invoice:', err.response);
@@ -112,6 +118,7 @@
             }
           });
           this.invoiceList = this.pendingInvoices;
+          this.$store.dispatch("updateInvoicesPending", this.pendingInvoices);
           console.log("this approvers invoices are:", this.pendingInvoices);
         })
     }

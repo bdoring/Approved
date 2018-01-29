@@ -10,7 +10,7 @@
       app
       style="margin-top: 65px;"
     >
-      <v-list style="padding: 0;">
+      <v-list style="padding: 1px;">
         <!-- ADMIN SIDEBAR -->
         <template v-for="(item, i) in items.admin" v-if="user.role.toLowerCase()==='admin'"
           >
@@ -43,7 +43,10 @@
             exact
           >
             <v-list-tile-action>
-              <v-icon v-html="item.icon"></v-icon>
+              <v-badge color="red" overlap v-model="pendingInvoices.length > 0">
+                <span v-if="(item.icon === 'home')" slot="badge">{{ pendingInvoices.length}}</span>
+                <v-icon large v-html="item.icon"></v-icon>
+              </v-badge>
             </v-list-tile-action>
             <v-list-tile-content>
               <v-list-tile-title v-text="item.title"></v-list-tile-title>
@@ -166,6 +169,11 @@ export default {
       right: true,
       rightDrawer: false,
       title: 'Approved'
+    }
+  },
+  computed: {
+    pendingInvoices(){
+      return this.$store.state.invoicesPending;
     }
   },
   methods: {
