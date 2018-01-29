@@ -9,6 +9,7 @@ import EditUser from '@/components/EditUser'
 import HomeApprover from '@/components/HomeApprover'
 import PastInvoices from '@/components/PastInvoices'
 import EditYourAccount from '@/components/EditYourAccount'
+import AllInvoices from '@/components/AllInvoices'
 
 Vue.use(Router)
 
@@ -24,6 +25,11 @@ export default new Router({
       path: '/new-invoice',
       name: 'UploadNewInvoice',
       component: UploadNewInvoice
+    },
+    {
+      path: '/all-invoices',
+      name: 'AllInvoices',
+      component: AllInvoices
     },
     {
       path: '/create-vendor',

@@ -220,6 +220,7 @@
         console.log('this.vendorSelected:', this.vendorSelected.id);
         if (this.changeApprover) {
           this.vendorSelected.user_id = this.newApprover.id;
+          this.vendorSelected.approverChanged = true;
         }
         this.axios.patch(`/vendors/${this.vendorSelected.id}`, this.vendorSelected)
           .then(response => {

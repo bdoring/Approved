@@ -7,39 +7,67 @@
     <div class="container">
       <h1>Hello, {{ user.first_name | proper }}</h1>
         <div class="home-dashboard">
-          <div>
-            <h2>Invoices Pending Approval</h2>
-            <div class="vendor-pending" v-for="invoice in invoices" v-if="invoice.status==='pending'">
-              <div >
+          <div class="searchbar">
+            <v-text-field
+            prepend-icon="search"
+            v-model="searchbar"
+            label="Search by invoice number"
+            @input="searchInvoices"
+            ></v-text-field>
+          </div>
+          <h2>Invoices Pending Approval</h2>
+          <div class="pending">
+            <div class="vendor-pending"
+              v-if="invoicesPending.length > 0"
+              v-for="invoice in invoicesPending">
+              <div>
                 <p>Vendor: {{invoice.name}}</p>
-                <p>Amount: ${{ invoice.amount }}</p>
+                <p>Invoice Number: {{invoice.invoice_number}}</p>
+                <p>Amount: ${{ invoice.amount | currencyFormat }}</p>
                 <p value="hi">Due date: {{invoice.invoice_due_date | formatDate }} - <b>{{dueDate(invoice.invoice_due_date)}}</b></p>
                 <p>Payment method: {{ invoice.payment_method}}</p>
                 <p>Pending approval from: {{invoice.first_name | proper }} {{invoice.last_name | proper }}</p>
-                <hr />
+                <div style="text-align: center">
+                  <a v-bind:href="invoice.url"
+                  target="_blank">
+                    <v-btn
+                      style="margin-left: 0"
+                      color="orange darken-2"
+                      outline
+                    ><v-icon
+                      dark left>insert_drive_file</v-icon>
+                      See Invoice PDF
+                    </v-btn>
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-          <div>
-            <h2>Invoices Scheduled For Payment</h2>
-            <div class="vendor-scheduled" v-for="invoice in invoices" v-if="invoice.status==='scheduled'">
-              <p>Vendor: {{invoice.name}}</p>
-              <p>Amount: ${{ invoice.amount }}</p>
-              <p>Due date: {{invoice.invoice_due_date | formatDate }} - <b>{{dueDate(invoice.invoice_due_date)}}</b></p>
-              <p>Payment method: {{ invoice.payment_method}}</p>
-              <p>Approved by: {{invoice.first_name | proper }} {{invoice.last_name | proper }}</p>
-              <hr />
+            <div class="no-invoices" v-if="invoicesPending.length === 0">
+              <p>No invoices.</p>
             </div>
           </div>
-          <div>
-            <h2>Invoices Ready To Be Scheduled</h2>
-            <div class="vendor-ready" v-for="invoice in invoices" v-if="invoice.status==='approved'">
+          <br>
+          <h2>Invoices Ready To Be Scheduled</h2>
+          <div class="approved">
+            <div
+              class="vendor-approved"
+              v-for="invoice in invoicesApproved"
+              v-if="invoicesApproved.length > 0"
+              >
               <p>Vendor: {{invoice.name}}</p>
-              <p>Amount: ${{ invoice.amount }}</p>
+              <p>Invoice Number: {{invoice.invoice_number}}</p>
+              <p>Amount: ${{ invoice.amount | currencyFormat }}</p>
               <p>Due date: {{invoice.invoice_due_date | formatDate }} - <b>{{dueDate(invoice.invoice_due_date)}}</b></p>
               <p>Payment method: {{ invoice.payment_method}}</p>
               <p>Approved by: {{invoice.first_name | proper }} {{invoice.last_name | proper }}</p>
-              <hr />
+              <div class="controls">
+                <v-btn
+                @click="schedulePayment(invoice.id)"
+                outline><v-icon left style="font-size: 18px;">fa-calendar</v-icon>Schedule Payment</v-btn>
+              </div>
+            </div>
+            <div class="no-invoices" v-if="invoicesApproved.length === 0">
+              <p>No invoices.</p>
             </div>
           </div>
         </div>
@@ -51,7 +79,10 @@ export default {
   data() {
     return {
       user: JSON.parse(localStorage.getItem('user')),
-      invoices: []
+      allInvoices: [],
+      searchbar: "",
+      invoicesPending: [],
+      invoicesApproved: []
     }
   },
   methods: {
@@ -60,17 +91,36 @@ export default {
       let today = new Date().toISOString().slice(0,10);
       let dueDate = (new Date(today) - new Date(invoiceDueDate)) / milisecondsInADay;
       return dueDate < 0 ? `${dueDate * (-1)} days until due` : `${dueDate} days past due`;
+    },
+    schedulePayment(invoiceID){
+      this.axios.patch(`/invoices/schedule/${invoiceID}`)
+        .then(response => {
+          console.log('scheduled invoice response:', response.data);
+          this.allInvoices = this.allInvoices.filter(invoice => invoice.id != invoiceID);
+          this.invoicesApproved = this.allInvoices.filter(invoice => (invoice.status.toLowerCase() === 'approved') && (!invoice.scheduled));
+        })
+    },
+    searchInvoices(){
+      this.invoicesPending = this.allInvoices.filter(invoices => invoices.invoice_number.toLowerCase().includes(this.searchbar.toLowerCase()) && invoices.status.toLowerCase() === "pending")
+      this.invoicesApproved = this.allInvoices.filter(invoices => invoices.invoice_number.toLowerCase().includes(this.searchbar.toLowerCase()) && invoices.status.toLowerCase() === "approved")
     }
   },
   created(){
     this.axios.get('/invoices')
       .then(response => {
         console.log('response from invoices/home:', response.data);
-        this.invoices = response.data.map(invoice => {
-          let formattedDate = new Date(invoice.invoice_due_date).toISOString().slice(0,10);
-          invoice.invoice_due_date = formattedDate;
-          console.log("formattedDate:", formattedDate);
-          return invoice;
+        this.allInvoices = response.data.filter(invoice => {
+          if (invoice.status.toLowerCase() !== "rejected") {
+            let formattedDate = new Date(invoice.invoice_due_date).toISOString().slice(0,10);
+            invoice.invoice_due_date = formattedDate;
+            if (invoice.status.toLowerCase() === 'pending') {
+              this.invoicesPending.push(invoice);
+            }
+            if ((invoice.status.toLowerCase() === 'approved') && (!invoice.scheduled)) {
+              this.invoicesApproved.push(invoice);
+            }
+            return invoice;
+          }
         });
       })
   }
@@ -96,29 +146,58 @@ a {
 
 .home-dashboard{
   margin-top: 10px;
-  display: flex;
-  /* background-color: lightblue; */
-  text-align: center;
-
 }
 
-.home-dashboard > div{
+.searchbar{
+  width: 300px;
+}
+
+.vendor-pending, .vendor-approved{
   flex: 1;
+  text-align: left;
+  margin: 10px;
+  font-size: 15px;
+  padding: 20px;
+  border: 1px solid lightgrey;
+  border-radius: 5px;
+  min-width: 400px;
+  max-width: 400px;
+}
+
+.vendor-pending{
+  background: #e0e0eb;
+}
+
+.vendor-approved{
+  background-color: #f0f0f5;
+}
+
+.pending, .approved{
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-y: scroll;
+
   border: 1px dotted grey;
   margin: 5px;
   border-radius: 5px;
   padding: 10px;
 }
 
-.vendor-pending, .vendor-scheduled, .vendor-ready{
-  text-align: left;
-  margin-top: 20px;
-  font-size: 15px;
+.no-invoices > p{
+  display: table-cell;
+  padding: 10px;
 }
 
 p{
   font-size: 17px;
 }
 
+.controls{
+  text-align: center;
+}
+
+a{
+  text-decoration:none;
+}
 
 </style>

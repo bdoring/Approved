@@ -23,6 +23,7 @@ module.exports = function(app){
   app.post('/invoices', invoices.createOne);
   app.patch('/invoices/:id', invoices.updateOne);
   app.patch('/invoices/status/:id', invoices.approveOrReject);
+  app.patch('/invoices/schedule/:id', invoices.schedule);
 
   //Auth Routes
   app.post('/auth/login', users.login);

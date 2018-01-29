@@ -2,10 +2,17 @@
   <div class="container">
     <h1>Hello, {{ user.first_name | proper }}</h1>
     <div class="home-dashboard">
-      <div>
+      <div v-if="pendingInvoices.length > 0">
         <h2>The Below Invoices Are Pending Your Approval</h2>
-        <div v-for="(invoice, index) in invoices" v-if="invoice.status.toLowerCase() === 'pending'"
-         v-show="!closeDIV.includes(invoice.id)">
+        <div class="searchbar">
+          <v-text-field
+          prepend-icon="search"
+          v-model="searchbar"
+          label="Search by invoice number"
+          @input="searchInvoices"
+          ></v-text-field>
+        </div>
+        <div v-for="(invoice, index) in invoiceList">
           <div class="vendor-pending" v-bind:class="{myBackground: (index % 2)}">
             <div>
               <p>Vendor: {{invoice.name}}</p>
@@ -51,6 +58,9 @@
           <hr />
         </div>
       </div>
+      <div v-if="!pendingInvoices.length > 0">
+        <h2>You don't have any invoices pending approval at this time.</h2>
+      </div>
     </div>
   </div>
 </template>
@@ -60,9 +70,10 @@
 		data() {
 			return {
           user: JSON.parse(localStorage.getItem('user')),
-          invoices: [],
+          pendingInvoices: [],
+          invoiceList: [],
           seeInvoice: false,
-          closeDIV: []
+          searchbar: ""
 			}
 		},
     methods: {
@@ -78,17 +89,21 @@
         this.axios.patch(`/invoices/status/${invoiceID}`, formData)
           .then(response => {
             console.log('response from approved invoice:', response.data);
-            this.closeDIV.push(invoiceID);
+            this.pendingInvoices = this.pendingInvoices.filter(invoice => invoice.id !== invoiceID);
+            this.invoiceList = this.pendingInvoices;
           })
           .catch(err => {
             console.log('error from approved invoice:', err.response);
           })
+      },
+      searchInvoices(){
+        this.invoiceList = this.pendingInvoices.filter(invoice => invoice.invoice_number.toLowerCase().includes(this.searchbar.toLowerCase()))
       }
     },
     created(){
       this.axios.get('/invoices')
         .then(response => {
-          this.invoices = response.data.filter(invoice => {
+          this.pendingInvoices = response.data.filter(invoice => {
             if ((invoice.action_user == this.user.id) && (invoice.status.toLowerCase() === "pending")) {
               let formattedDate = new Date(invoice.invoice_due_date).toISOString().slice(0,10);
               invoice.invoice_due_date = formattedDate;
@@ -96,7 +111,8 @@
               return invoice;
             }
           });
-          console.log("this approvers invoices are:", this.invoices);
+          this.invoiceList = this.pendingInvoices;
+          console.log("this approvers invoices are:", this.pendingInvoices);
         })
     }
 	}
@@ -113,6 +129,11 @@
   margin: 5px;
   border-radius: 5px;
   padding: 10px;
+}
+
+.searchbar{
+  width: 300px;
+  margin: 0 auto;
 }
 
 .vendor-pending{

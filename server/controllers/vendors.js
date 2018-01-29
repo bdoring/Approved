@@ -52,7 +52,25 @@ module.exports = {
 
   updateOne: function(req, res) {
     let updatedVendor = getVendorFromRequest(req.body);
-    console.log("updatedVendor:", updatedVendor);
+    console.log("approver changed?", req.body.approverChanged);
+    console.log('req.body:', req.body)
+    if (req.body.approverChanged) {
+      knex('vendors')
+        .where('id', req.params.id)
+        .then(vendor => {
+          console.log('the vendor is:', vendor);
+          knex('invoices')
+            .where({
+              vendor_id: req.params.id,
+              action_user: vendor[0].user_id,
+              status: 'pending' || 'PENDING'
+            })
+            .update({action_user: req.body.user_id}, '*')
+            .then(result => {
+              console.log('result:', result);
+            })
+        })
+    }
     knex('vendors')
       .update(updatedVendor, '*')
       .where('id', req.params.id)

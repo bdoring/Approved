@@ -107,5 +107,18 @@ module.exports = {
       .catch(err => {
         res.status(500).send({error: "Invoice Not Found."});
       })
+  },
+
+  schedule: function(req, res){
+    console.log('Scheduling invoice number:', req.params.id);
+    knex('invoices')
+      .update({scheduled: true}, '*')
+      .where('id', req.params.id)
+      .then(scheduledInvoice => {
+        res.status(200).send(scheduledInvoice);
+      })
+      .catch(err => {
+        res.status(500).send({error: "Invoice Not Found."});
+      })
   }
 }

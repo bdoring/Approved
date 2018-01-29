@@ -94,10 +94,16 @@ export default {
             title: 'Home',
             action: '/home-admin'
           },
+
           {
             icon: 'attach_file',
             title: 'Upload New Invoice',
             action: '/new-invoice'
+          },
+          {
+            icon: 'fa-files-o',
+            title: 'All Invoices',
+            action: '/all-invoices'
           },
           {
             divider: true

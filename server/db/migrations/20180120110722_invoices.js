@@ -14,6 +14,8 @@ exports.up = function(knex, Promise) {
     table.string('url');
     table.string('status')
       .defaultTo('pending');
+    table.boolean('scheduled')
+      .defaultTo(false);
     table.integer('action_user')
       .references('id')
       .inTable('users')
