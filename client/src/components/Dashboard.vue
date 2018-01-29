@@ -22,10 +22,18 @@
             exact
           >
             <v-list-tile-action>
-              <v-icon v-html="item.icon"></v-icon>
+              <v-badge
+                v-model="approvedInvoices.length > 0"
+                color="red"
+                overlap
+                >
+                <span v-if="(item.icon === 'home')" slot="badge">{{ approvedInvoices.length }}</span>
+                <v-icon medium v-html="item.icon"></v-icon>
+              </v-badge>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title v-text="item.title"></v-list-tile-title>
+              <v-list-tile-title v-text="item.title"
+              ></v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-divider v-else-if="item.divider"></v-divider>
@@ -45,8 +53,9 @@
             <v-list-tile-action>
               <v-badge color="red" overlap v-model="pendingInvoices.length > 0">
                 <span v-if="(item.icon === 'home')" slot="badge">{{ pendingInvoices.length}}</span>
-                <v-icon large v-html="item.icon"></v-icon>
+                <v-icon medium v-html="item.icon"></v-icon>
               </v-badge>
+
             </v-list-tile-action>
             <v-list-tile-content>
               <v-list-tile-title v-text="item.title"></v-list-tile-title>
@@ -174,6 +183,9 @@ export default {
   computed: {
     pendingInvoices(){
       return this.$store.state.invoicesPending;
+    },
+    approvedInvoices(){
+      return this.$store.state.invoicesApproved;
     }
   },
   methods: {

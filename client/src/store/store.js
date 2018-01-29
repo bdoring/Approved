@@ -14,11 +14,17 @@ export const store = new Vuex.Store({
     updateInvoicesPending: (state, payload) => {
       state.invoicesPending = payload;
     },
-    updateInvoicesRejected: (state, payload) => {}
+    updateInvoicesApproved: (state, payload) => {
+      console.log('here', payload)
+      state.invoicesApproved = payload;
+    }
   },
   actions: {
     updateInvoicesPending: (context, payload) => {
       context.commit('updateInvoicesPending', payload)
+    },
+    updateInvoicesApproved: (context, payload) => {
+      context.commit('updateInvoicesApproved', payload)
     }
   }
 });

@@ -95,7 +95,8 @@ module.exports = {
 
   approveOrReject: function(req, res){
     let newStatus = {
-      status: req.body.status
+      status: req.body.status,
+      updated_at: knex.fn.now()
     };
     console.log('new invoice status:', newStatus)
     knex('invoices')

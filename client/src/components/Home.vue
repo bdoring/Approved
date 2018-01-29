@@ -15,6 +15,30 @@
             @input="searchInvoices"
             ></v-text-field>
           </div>
+          <h2>Invoices Ready To Be Scheduled</h2>
+          <div class="approved">
+            <div
+              class="vendor-approved"
+              v-for="invoice in invoicesApproved"
+              v-if="invoicesApproved.length > 0"
+              >
+              <p>Vendor: {{invoice.name}}</p>
+              <p>Invoice Number: {{invoice.invoice_number}}</p>
+              <p>Amount: ${{ invoice.amount | currencyFormat }}</p>
+              <p>Due date: {{invoice.invoice_due_date | formatDate }} - <b>{{dueDate(invoice.invoice_due_date)}}</b></p>
+              <p>Payment method: {{ invoice.payment_method}}</p>
+              <p>Approved by: {{invoice.first_name | proper }} {{invoice.last_name | proper }}</p>
+              <div class="controls">
+                <v-btn
+                @click="schedulePayment(invoice.id)"
+                outline><v-icon left style="font-size: 18px;">fa-calendar</v-icon>Schedule Payment</v-btn>
+              </div>
+            </div>
+            <div class="no-invoices" v-if="invoicesApproved.length === 0">
+              <p>No invoices.</p>
+            </div>
+          </div>
+          <br>
           <h2>Invoices Pending Approval</h2>
           <div class="pending">
             <div class="vendor-pending"
@@ -46,30 +70,6 @@
               <p>No invoices.</p>
             </div>
           </div>
-          <br>
-          <h2>Invoices Ready To Be Scheduled</h2>
-          <div class="approved">
-            <div
-              class="vendor-approved"
-              v-for="invoice in invoicesApproved"
-              v-if="invoicesApproved.length > 0"
-              >
-              <p>Vendor: {{invoice.name}}</p>
-              <p>Invoice Number: {{invoice.invoice_number}}</p>
-              <p>Amount: ${{ invoice.amount | currencyFormat }}</p>
-              <p>Due date: {{invoice.invoice_due_date | formatDate }} - <b>{{dueDate(invoice.invoice_due_date)}}</b></p>
-              <p>Payment method: {{ invoice.payment_method}}</p>
-              <p>Approved by: {{invoice.first_name | proper }} {{invoice.last_name | proper }}</p>
-              <div class="controls">
-                <v-btn
-                @click="schedulePayment(invoice.id)"
-                outline><v-icon left style="font-size: 18px;">fa-calendar</v-icon>Schedule Payment</v-btn>
-              </div>
-            </div>
-            <div class="no-invoices" v-if="invoicesApproved.length === 0">
-              <p>No invoices.</p>
-            </div>
-          </div>
         </div>
     </div>
 </template>
@@ -98,6 +98,7 @@ export default {
           console.log('scheduled invoice response:', response.data);
           this.allInvoices = this.allInvoices.filter(invoice => invoice.id != invoiceID);
           this.invoicesApproved = this.allInvoices.filter(invoice => (invoice.status.toLowerCase() === 'approved') && (!invoice.scheduled));
+          this.$store.dispatch("updateInvoicesApproved", this.invoicesApproved);
         })
     },
     searchInvoices(){
@@ -122,6 +123,7 @@ export default {
             return invoice;
           }
         });
+        this.$store.dispatch("updateInvoicesApproved", this.invoicesApproved);
       })
   }
 }
