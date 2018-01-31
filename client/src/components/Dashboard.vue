@@ -8,7 +8,7 @@
       enable-resize-watcher
       absolute
       app
-      style="margin-top: 65px;"
+      style="padding-top: 65px;"
     >
       <v-list style="padding: 1px;">
         <!-- ADMIN SIDEBAR -->
@@ -27,12 +27,12 @@
                 color="red"
                 overlap
                 >
-                <span v-if="(item.icon === 'home')" slot="badge">{{ approvedInvoices.length }}</span>
+                <span v-if="(item.icon === 'fa-home')" slot="badge">{{ approvedInvoices.length }}</span>
                 <v-icon medium v-html="item.icon"></v-icon>
               </v-badge>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title v-text="item.title"
+              <v-list-tile-title style="font-weight: bold;" v-text="item.title"
               ></v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
@@ -52,13 +52,13 @@
           >
             <v-list-tile-action>
               <v-badge color="red" overlap v-model="pendingInvoices.length > 0">
-                <span v-if="(item.icon === 'home')" slot="badge">{{ pendingInvoices.length}}</span>
+                <span v-if="(item.icon === 'fa-home')" slot="badge">{{ pendingInvoices.length}}</span>
                 <v-icon medium v-html="item.icon"></v-icon>
               </v-badge>
 
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title v-text="item.title"></v-list-tile-title>
+              <v-list-tile-title style="font-weight: bold;" v-text="item.title"></v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-divider v-else-if="item.divider"></v-divider>
@@ -72,6 +72,7 @@
     >
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
       <v-toolbar-title id="approved" v-text="title"></v-toolbar-title>
+      <img src="../assets/checkmark.png" style="width: 30px; margin-left: 2px;"/>
       <v-spacer></v-spacer>
       <v-btn flat @click="userLogout">
         <span>Logout</span>
@@ -102,7 +103,7 @@ export default {
       items: {
         admin: [
           {
-            icon: 'home',
+            icon: 'fa-home',
             title: 'Home',
             action: '/home-admin'
           },
@@ -152,12 +153,12 @@ export default {
         ],
         approver:[
           {
-            icon: 'home',
+            icon: 'fa-home',
             title: 'Home',
             action: '/home-approver'
           },
           {
-            icon: 'insert_drive_file',
+            icon: 'fa-files-o',
             title: 'Past Invoices',
             action: '/invoices'
           },

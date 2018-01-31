@@ -62,9 +62,9 @@
         required
       ></v-text-field>
       <v-text-field
-        label="Tin"
+        label="TIN"
         v-model="vendorForm.tin"
-        :rules="[v => !!v || 'TIN Type is required']"
+        :rules="[v => !!v || 'TIN is required']"
         required
       ></v-text-field>
       <v-select
@@ -96,7 +96,9 @@
       ></v-text-field>
       <v-btn
         @click="submit"
-        :disabled="!valid" >
+        :disabled="!valid"
+        color="primary"
+        >
         submit
       </v-btn>
       <v-btn @click="clear">clear</v-btn>

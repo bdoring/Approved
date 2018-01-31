@@ -12,6 +12,9 @@
           @input="searchInvoices"
           ></v-text-field>
         </div>
+        <div v-if="!invoiceList.length > 0">
+          <p style="text-align: center; font-size: 20px;">No invoices found.</p>
+        </div>
         <div v-for="(invoice, index) in invoiceList">
           <div class="vendor-pending" v-bind:class="{myBackground: (index % 2)}">
             <div>
@@ -25,10 +28,13 @@
                 target="_blank">
                   <v-btn
                     style="margin-left: 0"
-                    color="orange darken-2"
+
                     outline
                   ><v-icon
-                    dark left>insert_drive_file</v-icon>
+                    dark
+                    left
+                    color="red"
+                    >fa-file-pdf-o</v-icon>
                     See Invoice PDF
                   </v-btn>
                 </a>
@@ -146,18 +152,20 @@
 .vendor-pending{
   display: flex;
   justify-content: center;
-  margin: 20px;
+  margin: 20px auto;
   font-size: 15px;
-  background: #e0e0eb;
+  background: #f0f0f5;
   padding: 10px;
   border-radius: 5px;
   border: 1px solid lightgrey;
+  width: 800px;
 }
 
 .vendor-pending > div {
-  flex: 1;
-  max-width: 370px;
+  flex-grow: 1 2;
+  max-width: 400px;
   overflow-x: scroll;
+  /* border: 1px solid black; */
 }
 
 p{
@@ -175,8 +183,9 @@ b{
 }
 
 .controls{
-  padding: 20px;
-  text-align: left;
+  padding: 70px 0;
+  text-align: center;
+  margin-left: 50px;
 }
 
 .hidden{
@@ -194,5 +203,10 @@ b{
 
 a{
   text-decoration:none;
+}
+
+hr{
+  width: 80%;
+  margin: 0 auto;
 }
 </style>

@@ -87,6 +87,21 @@ Vue.filter('currencyFormat', value => {
   return Number(value).toFixed(2);
 })
 
+
+Vue.mixin({
+  methods: {
+    toISODateFormat(date) {
+      return new Date(date).toISOString().slice(0,10);
+    },
+    invoiceDueMessage(invoiceDueDate){
+      let milisecondsInADay = 1000 * 60 * 60 * 24;
+      let today = new Date().toISOString().slice(0,10);
+      let dueDate = (new Date(today) - new Date(invoiceDueDate)) / milisecondsInADay;
+      console.log("TODAY'S DATE:", today);
+      return dueDate < 0 ? `${dueDate * (-1)} days until due date` : `${dueDate} days past due`;
+    }
+  }
+})
 new Vue({
   store: store,
   el: '#app',

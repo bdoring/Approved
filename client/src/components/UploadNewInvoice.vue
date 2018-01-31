@@ -12,126 +12,150 @@
       >
         {{ errorMessage }}
       </v-alert>
-      <v-form v-model="valid" ref="form" enctype="multipart/form-data" v-if="isInitial || isSaving || isFailed">
-        <v-layout row wrap>
-          <v-flex xs11 sm5>
-            <v-select
-              label="Vendor"
-              v-model="selectedVendor"
-              :items="vendors"
-              item-text="name"
-              :rules="[v => !!v || 'Vendor is required']"
-              required
-            ></v-select>
-            <p v-if="selectedVendor">Approval Required from: <b>{{ selectedVendor.first_name | proper }} {{ selectedVendor.last_name | proper }}</b> </p>
-              <v-text-field
-                label="Invoice Number"
-                v-model="invoiceNumber"
-                :rules="[(v) => !!v || 'Invoice Number is required']"
-                required
-              ></v-text-field>
-            <v-text-field
-              label="Amount"
-              v-model="amount"
-              placeholder="$0.00"
-              :rules="[(v) => !!v || 'Amount is required']"
-              required
-            ></v-text-field>
-          </v-flex>
-        </v-layout>
+      <div style="margin: 10px auto;">
+        <v-form v-model="valid" ref="form" enctype="multipart/form-data" v-if="isInitial || isSaving || isFailed">
+          <div class="form-container">
+            <div class="">
+              <v-layout row wrap>
+                <v-flex xs11>
+                  <p v-if="selectedVendor" style="margin: 20px 0; font-size: 20px;">
+                    <v-icon
+                      color="primary"
+                      style="vertical-align: top; margin-right: 5px;"
+                    >fa-user</v-icon>
+                    Approval Required from: <b>{{ selectedVendor.first_name | proper }} {{ selectedVendor.last_name | proper }}</b> </p>
+                  <v-select
+                    label="Vendor"
+                    v-model="selectedVendor"
+                    :items="vendors"
+                    item-text="name"
+                    :rules="[(v) => !!v || 'Vendor is required']"
+                    required
+                  ></v-select>
 
-        <!-- Invoice Date -->
-        <v-layout row wrap>
-          <v-flex xs11 sm5>
-            <v-menu
-              lazy
-              :close-on-content-click="true"
-              transition="scale-transition"
-              offset-y
-              full-width
-              :nudge-right="40"
-              max-width="290px"
-              min-width="290px"
+                    <v-text-field
+                      label="Invoice Number"
+                      v-model="invoiceNumber"
+                      :rules="[(v) => !!v || 'Invoice Number is required']"
+                      required
+                    ></v-text-field>
+                  <v-text-field
+                    label="Amount"
+                    v-model="amount"
+                    placeholder="$0.00"
+                    :rules="[(v) => !!v || 'Amount is required']"
+                    required
+                  ></v-text-field>
+                </v-flex>
+              </v-layout>
+
+              <!-- Invoice Date -->
+              <v-layout row wrap>
+                <v-flex xs11 style="margin-right: 20px;">
+                  <v-menu
+                    lazy
+                    :close-on-content-click="true"
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                    :nudge-right="40"
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <v-text-field
+                      slot="activator"
+                      label="Invoice Date"
+                      v-model="formattedDate"
+                      prepend-icon="event"
+                      :rules="[(v) => !!v || 'Invoice Date is required']"
+                      required
+                    ></v-text-field>
+                    <v-date-picker v-model="invoiceDate" @input="formattedDate = formatDate($event)" no-title scrollable actions>
+                    </v-date-picker>
+                  </v-menu>
+                </v-flex>
+
+                <!-- Invoice Due Date -->
+                <v-flex xs11>
+                  <v-menu
+                    lazy
+                    :close-on-content-click="true"
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                    :nudge-right="40"
+                    max-width="290px"
+                    min-width="290px"
+                    required
+                  >
+                    <v-text-field
+                      slot="activator"
+                      label="Invoice Due Date"
+                      v-model="formattedDueDate"
+                      prepend-icon="event"
+                      :rules="[(v) => !!v || 'Invoice Due Date is required']"
+                      required
+                    ></v-text-field>
+                    <v-date-picker v-model="invoiceDueDate" @input="formattedDueDate = formatDate($event)" no-title scrollable actions>
+                    </v-date-picker>
+                  </v-menu>
+                </v-flex>
+                <div style="margin: -20px 0 0 40px">
+                  <p
+                    v-if="selectedVendor"
+                    id="net-terms"
+                    style="display:table-cell">
+                    Net Terms: {{ selectedVendor.net_terms}}
+                  </p>
+                </div>
+              </v-layout>
+            </div>
+
+            <div class="dropbox">
+                <input
+                  name="upload"
+                  type="file"
+                  v-bind:disabled="isSaving"
+                  v-on:change="uploadInvoice($event.target.files[0])"
+                  accept=".jpg, .jpeg, .png, .pdf"
+                  class="input-file"
+                >
+                <p v-if="!uploadedInvoice">
+                  Drag the vendor invoice here <br/> or click to browse
+                </p>
+                <p v-if="uploadedInvoice" style="font-size: 20px;">
+                  <v-icon
+                  style="font-size: 50px;"
+                  color="red"
+                  >fa-file-pdf-o</v-icon>
+                  <br>
+                  {{ invoicePDF.name }}
+                </p>
+              </input>
+            </div>
+          </div>
+          <div style="margin-top: 10px;">
+            <v-btn
+              color="primary"
+              @click="submit"
+              :disabled="!uploadedInvoice"
             >
-              <v-text-field
-                slot="activator"
-                label="Invoice Date"
-                v-model="formattedDate"
-                prepend-icon="event"
-                :rules="[(v) => !!v || 'Invoice Date is required']"
-                required
-              ></v-text-field>
-              <v-date-picker v-model="invoiceDate" @input="formattedDate = formatDate($event)" no-title scrollable actions>
-              </v-date-picker>
-            </v-menu>
-          </v-flex>
-
-        </v-layout>
-
-        <!-- Invoice Due Date -->
-        <v-layout row wrap>
-          <v-flex xs11 sm5>
-            <v-menu
-              lazy
-              :close-on-content-click="true"
-              transition="scale-transition"
-              offset-y
-              full-width
-              :nudge-right="40"
-              max-width="290px"
-              min-width="290px"
-              required
-            >
-              <v-text-field
-                slot="activator"
-                label="Invoice Due Date"
-                v-model="formattedDueDate"
-                prepend-icon="event"
-                :rules="[(v) => !!v || 'Invoice Due Date is required']"
-                required
-              ></v-text-field>
-              <v-date-picker v-model="invoiceDueDate" @input="formattedDueDate = formatDate($event)" no-title scrollable actions>
-              </v-date-picker>
-            </v-menu>
-          </v-flex>
-          <p v-if="selectedVendor" id="net-terms">
-            Net Terms: {{ selectedVendor.payment_terms}}
-          </p>
-        </v-layout>
-
-        <div class="dropbox">
-            <input
-              name="upload"
-              type="file"
-              v-bind:disabled="isSaving"
-              v-on:change="uploadInvoice($event.target.files[0])"
-              accept=".jpg, .jpeg, .png, .pdf"
-              class="input-file"
-            >
-            <p v-if="!uploadedInvoice">
-              Drag the vendor invoice here <br/> or click to browse
-            </p>
-            <p v-else> {{ invoicePDF.name }}</p>
-          </input>
-        </div>
-        <v-btn
-          @click="submit"
-          :disabled="!uploadedInvoice"
-        >
-          submit
-        </v-btn>
-        <v-btn @click="clear">clear</v-btn>
-      </v-form>
+              submit
+            </v-btn>
+            <v-btn @click="clear">clear</v-btn>
+          </div>
+        </v-form>
+      </div>
       <p v-if="isSaving">
         Uploading Invoice...
       </p>
       <div v-if="isSuccess">
-        <p>
+        <p style="font-size: 20px;">
           File Successfully Uploaded!
         </p>
         <v-btn
         color="primary"
-        @click="clear">Go Back</v-btn>
+        @click="goBack">Go Back</v-btn>
       </div>
     </div>
 </template>
@@ -181,9 +205,11 @@
     methods: {
       clear() {
         this.currentStatus = STATUS_INITIAL;
-        if (this.$refs.form) {
-          this.$refs.form.reset();
-        } else {
+        // if (this.$refs.form) {
+        //   this.$refs.form.reset();
+        //   console.log('resetting...', this.selectedVendor)
+        // }
+        this.$refs.form.reset();
           this.show = false;
           this.uploadError = false;
           this.errorMessage = "",
@@ -197,11 +223,14 @@
           this.invoiceDate = null;
           this.invoiceDueDate = null;
           this.menu = false;
-          this.invoiceUploaded = false,
-          this.invoicePDF = "";
-        }
+          this.invoiceUploaded = false;
+          this.invoicePDF = null;
+      },
+      goBack(){
+        this.currentStatus = STATUS_INITIAL;
       },
       uploadInvoice(filePath) {
+        console.log('uploaded!');
         this.invoiceUploaded = true;
         this.invoicePDF = filePath;
       },
@@ -210,7 +239,7 @@
         if (this.invoiceDate && this.selectedVendor && !this.formattedDueDate) {
           console.log('here')
           let date = new Date(this.invoiceDate);
-          this.invoiceDueDate = new Date(date.setDate(date.getDate() + Number(this.selectedVendor.payment_terms))).toISOString().slice(0,10);
+          this.invoiceDueDate = new Date(date.setDate(date.getDate() + Number(this.selectedVendor.net_terms))).toISOString().slice(0,10);
           let [year, month, day] = this.invoiceDueDate.split('-');
           this.formattedDueDate = `${month.padStart(2, '0')}-${day.padStart(2, '0')}-${year}`;
         }
@@ -234,6 +263,9 @@
             this.currentStatus = STATUS_SUCCESS;
             this.uploadError = false;
             this.error = "";
+            this.$refs.form.reset();
+            this.invoicePDF = null;
+            this.invoiceUploaded = false;
           })
           .catch(err => {
             console.log('File upload catch/err:', err.response);
@@ -254,19 +286,24 @@
         .catch(err => {
           console.log('Retrieving vendors err:', err);
         })
-    },
-    mounted() {
-      this.$refs.form.reset();
     }
   }
 </script>
 
 <style scoped>
+
+.form-container{
+  display: flex;
+}
+
+.form-container > div {
+  flex: 1;
+}
+
 .dropbox {
-    outline: 1px dotted grey;
-    outline-offset: -10px;
+    border: 1px dotted grey;
     color: dimgray;
-    padding: 10px 10px;
+    padding: 120px 0;
     min-height: 200px;
     position: relative;
     cursor: pointer;

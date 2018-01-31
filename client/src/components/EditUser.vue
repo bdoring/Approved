@@ -2,7 +2,7 @@
   <div class="container">
       <h1>Edit User</h1>
       <div v-if="!userUpdated">
-        <v-card color="grey lighten-4" flat>
+        <v-card color="grey lighten-4" flat style="margin-bottom: 20px;">
          <v-card-text style="border: 1px dotted grey; margin-top: 10px;">
            <v-container fluid>
              <v-layout row wrap>
@@ -51,9 +51,11 @@
          ></v-select>
          <div class="update-password">
            <v-btn
-           color="light-blue darken-2"
+           outline
            @click="updatePassword = true"
-           >Update Password?</v-btn>
+           >
+           <v-icon left style="color: #FF9000">fa-lock</v-icon>
+           Update Password?</v-btn>
            <div v-if="updatePassword">
              <v-form ref="newPassword">
                <v-text-field
@@ -74,6 +76,7 @@
          <v-btn
            @click="submit"
            :disabled="!valid"
+           color="primary"
          >
            submit
          </v-btn>
@@ -82,6 +85,7 @@
       </div>
      <div v-if="userUpdated">
        <h3>User was updated successfully!</h3>
+       <v-btn @click="userUpdated = false">Go back</v-btn>
      </div>
   </div>
 </template>
@@ -119,6 +123,20 @@
             console.log('response from edit users', response.data);
             this.$refs.form.reset();
             this.userUpdated = true;
+            this.userSelected = false;
+            this.axios.get('/users')
+              .then(response => {
+                this.users = response.data.map(user => {
+                  user.role = `${user.role[0] + user.role.slice(1).toLocaleLowerCase()}`
+                  user.fullName = `${user.first_name[0] + user.first_name.slice(1).toLowerCase()} ${user.last_name[0] + user.last_name.slice(1).toLowerCase()}`;
+                  user.password = null;
+                  this.$options.filters.proper(user.first_name);
+                  user.last_name = this.$options.filters.proper(user.last_name);
+                  user.email = user.email.toLowerCase();
+                  return user;
+                })
+                console.log("this.users:", this.users)
+              })
           })
       }
     },
@@ -129,6 +147,9 @@
             user.role = `${user.role[0] + user.role.slice(1).toLocaleLowerCase()}`
             user.fullName = `${user.first_name[0] + user.first_name.slice(1).toLowerCase()} ${user.last_name[0] + user.last_name.slice(1).toLowerCase()}`;
             user.password = null;
+            user.first_name = this.$options.filters.proper(user.first_name);
+            user.last_name = this.$options.filters.proper(user.last_name);
+            user.email = user.email.toLowerCase();
             return user;
           })
           console.log("this.users:", this.users)

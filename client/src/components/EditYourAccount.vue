@@ -20,28 +20,25 @@
         :rules="emailRules"
         required
       ></v-text-field>
-      <v-select
-        label="User Role"
-        v-model="userEdited.role"
-        :items="userRoles"
-        :rules="[v => !!v || 'Role is required']"
-        required
-      ></v-select>
       <div class="update-password">
         <v-btn
-        color="light-blue darken-2"
+        outline
         @click="updatePassword = true"
-        >Update Password?</v-btn>
+        >
+        <v-icon left style="color: #FF9000">fa-lock</v-icon>
+        Update Password?</v-btn>
         <div v-if="updatePassword">
           <v-form ref="newPassword">
             <v-text-field
               label="New Password"
               v-model="userEdited.password"
+              type="password"
               required
             ></v-text-field>
             <v-text-field
               label="Re-type New Password"
               v-model="retypedNewPassword"
+              type="password"
               :rules="passwordRules"
               required
             ></v-text-field>
@@ -49,15 +46,19 @@
           </v-form>
         </div>
       </div>
-      <v-btn
-        @click="submit"
-        :disabled="!valid"
-      >
-        submit
-      </v-btn>
+      <div style="margin-top: 10px">
+        <v-btn
+          @click="submit"
+          :disabled="!valid"
+          color="primary"
+        >
+          submit
+        </v-btn>
+      </div>
     </v-form>
     <div v-if="wasUserEdited">
-      <h3>User was created successfully!</h3>
+      <h3>Your account was updated successfully!</h3>
+      <v-btn @click="wasUserEdited = false">Go Back</v-btn>
     </div>
   </div>
 </template>
@@ -93,6 +94,16 @@
         this.axios.patch(`/users/${this.user.id}`, this.userEdited)
           .then(response => {
             console.log('response from edit user:', response.data)
+            this.wasUserEdited = true;
+            this.axios.get(`/users/${this.user.id}`)
+              .then(response => {
+                this.userEdited = response.data[0];
+                this.userEdited.first_name = this.$options.filters.proper(this.userEdited.first_name);
+                this.userEdited.last_name = this.$options.filters.proper(this.userEdited.last_name);
+                this.userEdited.email = this.userEdited.email.toLowerCase();
+                this.userEdited.password = null;
+                console.log('this userEdited:', this.userEdited)
+              })
           })
 
       }
@@ -101,7 +112,9 @@
       this.axios.get(`/users/${this.user.id}`)
         .then(response => {
           this.userEdited = response.data[0];
-          this.userEdited.role = `${response.data[0].role[0] + response.data[0].role.slice(1).toLocaleLowerCase()}`;
+          this.userEdited.first_name = this.$options.filters.proper(this.userEdited.first_name);
+          this.userEdited.last_name = this.$options.filters.proper(this.userEdited.last_name);
+          this.userEdited.email = this.userEdited.email.toLowerCase();
           this.userEdited.password = null;
           console.log('this userEdited:', this.userEdited)
         })

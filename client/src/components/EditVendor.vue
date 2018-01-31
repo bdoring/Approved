@@ -13,7 +13,7 @@
                <v-select
                  v-bind:items="vendors"
                  v-model="vendorSelected"
-                 item-text="name"
+                 item-text="companyName"
                  label="Select Vendor"
                  autocomplete
                ></v-select>
@@ -27,7 +27,7 @@
        <div class="approver" >
          <v-flex>
            <h2>Current Approver: {{ vendorSelected.first_name | proper }} {{ vendorSelected.last_name | proper }}
-             <v-btn color="primary" @click="changeApprover = true" ><v-icon left>person</v-icon>Change Approver</v-btn>
+             <v-btn outline @click="changeApprover = true" ><v-icon left color="primary">person</v-icon>Change Approver</v-btn>
            </h2>
            <div class="changeApprover" v-if="changeApprover">
              <v-select
@@ -87,9 +87,9 @@
          required
        ></v-text-field>
        <v-text-field
-         label="Tin"
+         label="TIN"
          v-model="vendorSelected.tin"
-         :rules="[v => !!v || 'TIN Type is required']"
+         :rules="[v => !!v || 'TIN is required']"
          required
        ></v-text-field>
        <v-select
@@ -121,7 +121,8 @@
        ></v-text-field>
        <v-btn
          @click="submit"
-         :disabled="!valid" >
+         :disabled="!valid"
+         color="primary">
          submit
        </v-btn>
        <v-btn @click="vendorSelected=null">cancel</v-btn>
@@ -129,12 +130,13 @@
     </div>
    <div v-if="vendorUpdated">
      <h3>Vendor was updated successfully!</h3>
+     <v-btn @click="vendorUpdated = false">Go Back</v-btn>
    </div>
  </div>
 </template>
 
 <script>
-  
+
 	export default {
 		data() {
 			return {
@@ -204,7 +206,7 @@
         ],
         types: ["SSN", "EIN"],
         paymentOptions: [
-          "ACH", "Credit Card", "Check"
+          "ACH", "CREDIT CARD", "CHECK"
         ],
         stateRules: [
           (v) => !!v || 'State is required',
@@ -228,6 +230,25 @@
             console.log('response from edit vendor:', response.data);
             this.$refs.form.reset();
             this.vendorUpdated = true;
+            this.vendorSelected = false;
+            this.axios.get('/vendors')
+              .then(response => {
+                console.log('Your vendors are:', response.data);
+                this.vendors = response.data.map(vendor => {
+                  vendor.companyName = vendor.name;
+                  return vendor;
+                });
+              });
+            this.axios.get('/users')
+              .then(response => {
+                this.listOfApprovers = response.data.filter(user => {
+                  if (user.role.toLowerCase() === 'approver') {
+                    user.fullName = `${user.first_name[0] + user.first_name.slice(1).toLowerCase()} ${user.last_name[0] + user.last_name.slice(1).toLowerCase()}`;
+                    return user;
+                  }
+                })
+              })
+            // DELETE IN CASE OF ERRORS
           })
       },
       cancel(){
@@ -244,7 +265,10 @@
       this.axios.get('/vendors')
         .then(response => {
           console.log('Your vendors are:', response.data);
-          this.vendors = response.data;
+          this.vendors = response.data.map(vendor => {
+            vendor.companyName = vendor.name;
+            return vendor;
+          });
         });
       this.axios.get('/users')
         .then(response => {

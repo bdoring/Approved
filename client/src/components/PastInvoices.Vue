@@ -14,21 +14,38 @@
     <div class="approved">
         <div class="approved-invoices" v-for="invoice in approvedInvoices" v-if="invoice.status.toLowerCase() === 'approved'">
           <div>
-            <p>Vendor: {{invoice.name}}</p>
-            <p>Invoice number: {{invoice.invoice_number}}</p>
-            <p>Amount: ${{ invoice.amount | currencyFormat }}</p>
-            <p>Due date: {{invoice.invoice_due_date | formatDate }}</p>
-            <p>Payment method: {{ invoice.payment_method}}</p>
-            <p>Status: <b>{{ invoice.status | proper }}</b></p>
-            <div style="text-align:left">
+            <p><b>VENDOR:</b> {{invoice.name}}</p>
+            <p><b>INVOICE NUMBER:</b> {{invoice.invoice_number}}</p>
+            <p><b>AMOUNT:</b> ${{ invoice.amount | currencyFormat }}</p>
+            <p><b>DUE DATE:</b> {{invoice.invoice_due_date | formatDate }}</p>
+            <p><b>PAYMENT METHOD:</b> {{ invoice.payment_method}}</p>
+            <p><b>STATUS:</b> {{ invoice.status | proper }} on {{ invoice.updated_at | formatDate}}</p>
+            <div v-if="invoice.scheduled">
+              <p style="text-align: center">
+                <v-icon
+                  color="green"
+                  style="font-size: 20px; vertical-align: top; margin-right: 5px;"
+                  >fa-calendar-check-o</v-icon>
+                Payment has been scheduled.</p>
+            </div>
+            <div v-if="!invoice.scheduled">
+              <p style="text-align: center">
+                <v-icon
+                  style="font-size: 20px; vertical-align: top; margin-right: 5px; color: #FF9000"
+                  >fa-calendar-times-o</v-icon>
+                Payment has not yet been schedule.</p>
+            </div>
+            <div style="text-align:center">
               <a v-bind:href="invoice.url"
               target="_blank">
                 <v-btn
                   style="margin-left: 0"
-                  color="orange darken-2"
                   outline
                 ><v-icon
-                  dark left>insert_drive_file</v-icon>
+                  dark
+                  left
+                  color="red"
+                  >fa-file-pdf-o</v-icon>
                   See Invoice PDF
                 </v-btn>
               </a>
@@ -43,21 +60,26 @@
     <div class="rejected">
       <div class="rejected-invoices" v-for="invoice in rejectedInvoices" v-if="invoice.status.toLowerCase() === 'rejected'">
         <div>
-          <p>Vendor: {{invoice.name}}</p>
-          <p>Invoice number: {{invoice.invoice_number}}</p>
-          <p>Amount: ${{ invoice.amount | currencyFormat }}</p>
-          <p>Due date: {{invoice.invoice_due_date | formatDate }}</p>
-          <p>Payment method: {{ invoice.payment_method}}</p>
-          <p>Status: <b>{{ invoice.status | proper }}</b></p>
-          <div style="text-align:left">
+          <p><b>VENDOR:</b> {{invoice.name}}</p>
+          <p><b>INVOICE NUMBER:</b> {{invoice.invoice_number}}</p>
+          <p><b>AMOUNT:</b> ${{ invoice.amount | currencyFormat }}</p>
+          <p style="text-align: center">
+            <v-icon
+              color="red"
+              style="font-size: 20px; vertical-align: top; margin-right: 5px;"
+              >fa-user-times</v-icon>
+            {{ invoice.status | proper }} on {{ invoice.updated_at | formatDate}}</p>
+          <div style="text-align:center">
             <a v-bind:href="invoice.url"
             target="_blank">
               <v-btn
                 style="margin-left: 0"
-                color="orange darken-2"
                 outline
               ><v-icon
-                dark left>insert_drive_file</v-icon>
+                dark
+                left
+                color="red"
+                >fa-file-pdf-o</v-icon>
                 See Invoice PDF
               </v-btn>
             </a>
@@ -93,8 +115,8 @@
         .then(response => {
           this.allInvoices = response.data.filter(invoice => {
             if ((invoice.action_user == this.user.id) && (invoice.status.toLowerCase() !== "pending")) {
-              let formattedDate = new Date(invoice.invoice_due_date).toISOString().slice(0,10);
-              invoice.invoice_due_date = formattedDate;
+              invoice.invoice_due_date = this.toISODateFormat(invoice.invoice_due_date);
+              invoice.updated_at = this.toISODateFormat(invoice.updated_at);
               invoice.status.toLowerCase() === 'approved' ? this.approvedInvoices.push(invoice) : this.rejectedInvoices.push(invoice)
               return invoice;
             }
@@ -127,12 +149,20 @@
 }
 
 .approved-invoices, .rejected-invoices{
-  margin: 10px 30px;
+  flex: 1;
+  margin: 10px;
   font-size: 17px;
   background: #f0f0f5;
   padding: 20px;
   border-radius: 5px;
   border: 1px solid lightgrey;
+  max-width: 450px;
+  min-width: 450px;
+}
+
+.approved::after{
+  content: "";
+  flex: 0 0 10px;
 }
 
 a{

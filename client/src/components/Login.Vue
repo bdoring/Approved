@@ -1,7 +1,10 @@
 <template>
   <v-app>
     <div class="login">
-      <h1 id="logo">Approved</h1>
+      <!-- <h1 id="logo">Approved</h1> -->
+      <div class="logo-box">
+        <img id="logo-img" src="../assets/Approved.png" alt="">
+      </div>
       <div class="login-form elevation-24">
         <v-form v-model="valid" ref="form">
           <v-text-field
@@ -21,6 +24,7 @@
           <v-btn
             @click="userLogin"
             :disabled="!valid"
+            color="primary"
           >
             login
           </v-btn>
@@ -104,6 +108,7 @@ export default {
     border: 1px solid grey;
     border-radius: 3px;
   }
+
   #logo{
     font-family: 'Poiret One';
     font-weight: normal;
@@ -112,6 +117,16 @@ export default {
     color: #2c3e50;
     margin: 30px;
   }
+
+  #logo-img {
+    width: 600px;
+  }
+
+  .logo-box{
+    margin: 50px auto;
+    text-align: center;
+  }
+
   .error-box{
     margin: 20px auto;
     width: 300px;

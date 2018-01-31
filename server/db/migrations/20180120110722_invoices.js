@@ -14,13 +14,13 @@ exports.up = function(knex, Promise) {
     table.string('url');
     table.string('status')
       .defaultTo('pending');
-    table.boolean('scheduled')
-      .defaultTo(false);
     table.integer('action_user')
       .references('id')
       .inTable('users')
       .onDelete('CASCADE')
       .index();
+    table.boolean('scheduled')
+      .defaultTo(false);
     table.timestamps(true, true);
   })
 };
