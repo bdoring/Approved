@@ -4,17 +4,17 @@ function getVendorFromRequest(request) {
   console.log("request", request)
   return {
     user_id: request.user ? request.user.id : request.user_id,
-    name: request.name.toUpperCase(),
+    name: request.name,
     tin: request.tin || null,
-    tin_type: request.tin_type.toUpperCase(),
-    street_address: request.street_address.toUpperCase(),
-    city: request.city.toUpperCase(),
-    state: request.state.toUpperCase(),
-    zipcode: request.zipcode.toUpperCase(),
+    tin_type: request.tin_type,
+    street_address: request.street_address,
+    city: request.city,
+    state: request.state,
+    zipcode: request.zipcode,
     phone_number: request.phone_number,
-    email: request.email.toUpperCase(),
+    email: request.email,
     net_terms: request.net_terms,
-    payment_method: request.payment_method.toUpperCase(),
+    payment_method: request.payment_method,
     gl_code: request.gl_code
   }
 }

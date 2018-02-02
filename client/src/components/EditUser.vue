@@ -131,6 +131,7 @@
                   user.fullName = `${user.first_name[0] + user.first_name.slice(1).toLowerCase()} ${user.last_name[0] + user.last_name.slice(1).toLowerCase()}`;
                   user.password = null;
                   this.$options.filters.proper(user.first_name);
+                  user.first_name = this.$options.filters.proper(user.first_name);
                   user.last_name = this.$options.filters.proper(user.last_name);
                   user.email = user.email.toLowerCase();
                   return user;

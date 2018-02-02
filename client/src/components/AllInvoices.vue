@@ -177,7 +177,8 @@
   padding: 20px;
   margin: 5px;
   background: #FFFFFF;
-  max-width: 500px;
+  max-width: 400px;
+  min-width: 400px;
 }
 
 .no-invoices{
